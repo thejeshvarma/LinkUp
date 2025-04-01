@@ -24,7 +24,9 @@ const allowedOrigins = [
   'http://localhost:5173',
   'https://link-up-front.vercel.app',
   'https://link-up.vercel.app',
-  'https://linkup-chat.vercel.app'
+  'https://linkup-chat.vercel.app',
+  'https://link-up-git-main-thejeshvarma.vercel.app',
+  'https://link-up-thejeshvarma.vercel.app'
 ];
 
 app.use(cors({
