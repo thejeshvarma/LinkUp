@@ -22,7 +22,8 @@ const httpServer = createServer(app);
 // Configure CORS for both Express and Socket.IO
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://link-up-client.vercel.app',
+  'https://link-up-front.vercel.app',
+  'https://link-up.vercel.app',
   'https://linkup-chat.vercel.app'
 ];
 
