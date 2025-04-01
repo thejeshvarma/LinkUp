@@ -18,14 +18,33 @@ interface Message {
 
 const app = express();
 const httpServer = createServer(app);
+
+// Configure CORS for both Express and Socket.IO
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://link-up-client.vercel.app',
+  'https://linkup-chat.vercel.app'
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
+
 const io = new Server(httpServer, {
   cors: {
-    origin: 'http://localhost:5173', // Vite's default port
+    origin: allowedOrigins,
     methods: ['GET', 'POST'],
-  },
+    credentials: true
+  }
 });
 
-app.use(cors());
 app.use(express.json());
 
 // In-memory storage (replace with a database in production)
@@ -83,6 +102,11 @@ io.on('connection', (socket) => {
     }
     console.log('A user disconnected');
   });
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy' });
 });
 
 const PORT = process.env.PORT || 3001;
