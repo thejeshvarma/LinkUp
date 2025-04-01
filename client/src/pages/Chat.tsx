@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { io, Socket } from 'socket.io-client';
+import { io as socketIO, Socket as SocketType } from 'socket.io-client';
 
 interface Message {
   id: string;
@@ -13,10 +13,10 @@ interface ChatProps {
   onLogout: () => void;
 }
 
-const SOCKET_URL = 'http://localhost:3001';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 
 const Chat = ({ username, onLogout }: ChatProps) => {
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const [socket, setSocket] = useState<SocketType | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
@@ -24,7 +24,9 @@ const Chat = ({ username, onLogout }: ChatProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const newSocket = io(SOCKET_URL);
+    const newSocket = socketIO(SOCKET_URL, {
+      withCredentials: true
+    });
     setSocket(newSocket);
 
     newSocket.emit('user:join', username);
