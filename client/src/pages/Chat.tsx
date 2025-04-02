@@ -26,12 +26,13 @@ const Chat = ({ username, onLogout }: ChatProps) => {
   useEffect(() => {
     const newSocket = socketIO(SOCKET_URL, {
       withCredentials: true,
-      transports: ['polling', 'websocket'],
+      transports: ['polling'],
       path: '/socket.io/',
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
-      timeout: 60000
+      timeout: 45000,
+      forceNew: true
     });
     setSocket(newSocket);
 
@@ -42,6 +43,10 @@ const Chat = ({ username, onLogout }: ChatProps) => {
 
     newSocket.on('connect_error', (error) => {
       console.error('Connection error:', error);
+    });
+
+    newSocket.on('disconnect', (reason) => {
+      console.log('Disconnected:', reason);
     });
 
     newSocket.on('user:list', (users: string[]) => {
