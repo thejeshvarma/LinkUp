@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, RequestHandler } from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
@@ -16,6 +16,16 @@ interface Message {
   timestamp: number;
 }
 
+interface RegisterRequest {
+  username: string;
+  password: string;
+}
+
+interface LoginRequest {
+  username: string;
+  password: string;
+}
+
 const app = express();
 const httpServer = createServer(app);
 
@@ -26,7 +36,8 @@ const allowedOrigins = [
   'https://link-up.vercel.app',
   'https://linkup-chat.vercel.app',
   'https://link-up-git-main-thejeshvarma.vercel.app',
-  'https://link-up-thejeshvarma.vercel.app'
+  'https://link-up-thejeshvarma.vercel.app',
+  'https://link-upch.vercel.app'
 ];
 
 app.use(cors({
@@ -55,34 +66,40 @@ const users: User[] = [];
 const onlineUsers = new Set<string>();
 
 // Authentication endpoints
-app.post('/api/register', async (req, res) => {
+const registerHandler: RequestHandler = async (req, res) => {
   const { username, password } = req.body;
 
   if (users.some((user) => user.username === username)) {
-    return res.status(400).json({ error: 'Username already exists' });
+    res.status(400).json({ error: 'Username already exists' });
+    return;
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
   users.push({ username, password: hashedPassword });
 
   res.status(201).json({ message: 'User registered successfully' });
-});
+};
 
-app.post('/api/login', async (req, res) => {
+const loginHandler: RequestHandler = async (req, res) => {
   const { username, password } = req.body;
   const user = users.find((u) => u.username === username);
 
   if (!user) {
-    return res.status(401).json({ error: 'Invalid credentials' });
+    res.status(401).json({ error: 'Invalid credentials' });
+    return;
   }
 
   const isValidPassword = await bcrypt.compare(password, user.password);
   if (!isValidPassword) {
-    return res.status(401).json({ error: 'Invalid credentials' });
+    res.status(401).json({ error: 'Invalid credentials' });
+    return;
   }
 
   res.json({ message: 'Login successful' });
-});
+};
+
+app.post('/api/register', registerHandler);
+app.post('/api/login', loginHandler);
 
 // Socket.IO event handlers
 io.on('connection', (socket) => {
