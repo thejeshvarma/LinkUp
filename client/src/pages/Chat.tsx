@@ -26,14 +26,23 @@ const Chat = ({ username, onLogout }: ChatProps) => {
   useEffect(() => {
     const newSocket = socketIO(SOCKET_URL, {
       withCredentials: true,
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'],
+      path: '/socket.io/',
       reconnection: true,
       reconnectionAttempts: 5,
-      reconnectionDelay: 1000
+      reconnectionDelay: 1000,
+      timeout: 60000
     });
     setSocket(newSocket);
 
-    newSocket.emit('user:join', username);
+    newSocket.on('connect', () => {
+      console.log('Connected to server');
+      newSocket.emit('user:join', username);
+    });
+
+    newSocket.on('connect_error', (error) => {
+      console.error('Connection error:', error);
+    });
 
     newSocket.on('user:list', (users: string[]) => {
       setOnlineUsers(users);

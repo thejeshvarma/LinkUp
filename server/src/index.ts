@@ -56,11 +56,13 @@ const io = new Server(httpServer, {
     origin: allowedOrigins,
     methods: ['GET', 'POST'],
     credentials: true,
-    allowedHeaders: ['*'],
-    exposedHeaders: ['*']
+    allowedHeaders: ['*']
   },
-  transports: ['websocket', 'polling'],
-  allowEIO3: true
+  path: '/socket.io/',
+  transports: ['polling', 'websocket'],
+  allowEIO3: true,
+  pingTimeout: 60000,
+  pingInterval: 25000
 });
 
 app.use(express.json());
