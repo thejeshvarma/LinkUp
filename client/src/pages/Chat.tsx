@@ -59,8 +59,9 @@ const Chat = ({ username, onLogout }: ChatProps) => {
       timestamp: Date.now(),
     };
 
-    socket.emit('chat:message', message);
+    setMessages((prev) => [...prev, message]);
     setNewMessage('');
+    socket.emit('chat:message', message);
   };
 
   const formatTime = (timestamp: number) => {
