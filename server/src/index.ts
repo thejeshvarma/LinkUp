@@ -55,8 +55,12 @@ const io = new Server(httpServer, {
   cors: {
     origin: allowedOrigins,
     methods: ['GET', 'POST'],
-    credentials: true
-  }
+    credentials: true,
+    allowedHeaders: ['*'],
+    exposedHeaders: ['*']
+  },
+  transports: ['websocket', 'polling'],
+  allowEIO3: true
 });
 
 app.use(express.json());
