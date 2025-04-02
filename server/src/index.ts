@@ -61,7 +61,8 @@ const io = new Server(httpServer, {
   allowEIO3: true,
   pingTimeout: 60000,
   pingInterval: 25000,
-  connectTimeout: 45000
+  connectTimeout: 45000,
+  maxHttpBufferSize: 1e8
 });
 
 app.use(express.json());
@@ -127,6 +128,11 @@ io.on('connection', (socket) => {
     }
     console.log('A user disconnected');
   });
+});
+
+// Add error handling for Socket.IO
+io.engine.on('connection_error', (err) => {
+  console.log('Connection error:', err);
 });
 
 // Health check endpoint

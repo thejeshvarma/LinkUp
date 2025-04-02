@@ -32,7 +32,11 @@ const Chat = ({ username, onLogout }: ChatProps) => {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
       timeout: 45000,
-      forceNew: true
+      forceNew: true,
+      autoConnect: true,
+      extraHeaders: {
+        'Access-Control-Allow-Origin': '*'
+      }
     });
     setSocket(newSocket);
 
@@ -42,11 +46,31 @@ const Chat = ({ username, onLogout }: ChatProps) => {
     });
 
     newSocket.on('connect_error', (error) => {
-      console.error('Connection error:', error);
+      console.error('Connection error:', error.message);
     });
 
     newSocket.on('disconnect', (reason) => {
       console.log('Disconnected:', reason);
+      if (reason === 'io server disconnect') {
+        // Server initiated disconnect, try to reconnect
+        newSocket.connect();
+      }
+    });
+
+    newSocket.on('error', (error) => {
+      console.error('Socket error:', error);
+    });
+
+    newSocket.on('reconnect_attempt', (attemptNumber) => {
+      console.log('Attempting to reconnect:', attemptNumber);
+    });
+
+    newSocket.on('reconnect_error', (error) => {
+      console.error('Reconnection error:', error);
+    });
+
+    newSocket.on('reconnect_failed', () => {
+      console.log('Failed to reconnect');
     });
 
     newSocket.on('user:list', (users: string[]) => {
