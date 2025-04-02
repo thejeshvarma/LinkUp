@@ -25,7 +25,11 @@ const Chat = ({ username, onLogout }: ChatProps) => {
 
   useEffect(() => {
     const newSocket = socketIO(SOCKET_URL, {
-      withCredentials: true
+      withCredentials: true,
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000
     });
     setSocket(newSocket);
 
