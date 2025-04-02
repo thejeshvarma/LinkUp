@@ -45,7 +45,9 @@ app.use(cors({
   origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Type', 'Authorization'],
+  preflightContinue: false
 }));
 
 // Configure Socket.IO
@@ -54,7 +56,8 @@ const io = new Server(httpServer, {
     origin: allowedOrigins,
     methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['Content-Type', 'Authorization']
   },
   path: '/socket.io/',
   transports: ['polling'],
@@ -139,6 +142,9 @@ io.engine.on('connection_error', (err) => {
 app.get('/health', (req, res) => {
   res.json({ status: 'healthy' });
 });
+
+// Handle preflight requests
+app.options('*', cors());
 
 const PORT = process.env.PORT || 3001;
 httpServer.listen(PORT, () => {

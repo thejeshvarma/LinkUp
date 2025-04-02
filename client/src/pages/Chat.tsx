@@ -33,10 +33,7 @@ const Chat = ({ username, onLogout }: ChatProps) => {
       reconnectionDelay: 1000,
       timeout: 45000,
       forceNew: true,
-      autoConnect: true,
-      extraHeaders: {
-        'Access-Control-Allow-Origin': '*'
-      }
+      autoConnect: true
     });
     setSocket(newSocket);
 
